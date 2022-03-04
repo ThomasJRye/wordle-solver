@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::env;
 use std::fs;
 
@@ -10,7 +11,10 @@ fn main() {
 
     let shortwords = fivelettersonly(words);
 
-    println!("{:?}", words_by_usage(&shortwords));
+    let letters = letters_by_usage(&shortwords);
+
+    let s = get_word_scores(shortwords, letters);
+    println!("{:?}", s);
 }
 
 fn getwords(wordList: String) -> Vec<String> {
@@ -72,8 +76,18 @@ fn contains(word: String, letter: char) -> bool {
     return false;
 }
 
-fn letter_counter(words: Vec<String>, letter: char) -> usize {
-    let mut count: usize = 0;
+fn contains_all(word: String, letters: String) -> bool {
+    for i in letters.chars() {
+        if !word.contains(i) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+fn letter_counter(words: Vec<String>, letter: char) -> u32 {
+    let mut count: u32 = 0;
     for word in words {
         if word.contains(letter) {
             count += 1;
@@ -83,13 +97,13 @@ fn letter_counter(words: Vec<String>, letter: char) -> usize {
     return count;
 }
 
-#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 struct Letter {
     letter: char,
-    uses: usize,
+    uses: u32,
 }
 
-fn words_by_usage(words: &Vec<String>) -> Vec<Letter> {
+fn letters_by_usage(words: &Vec<String>) -> Vec<Letter> {
     static ASCII_LOWER: [char; 26] = [
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
         's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
@@ -108,21 +122,53 @@ fn words_by_usage(words: &Vec<String>) -> Vec<Letter> {
     return letters;
 }
 
-fn get_words_with_most_used_letters(words: &Vec<String>) -> Vec<String> {
-    let mut all_words = words_by_usage(words);
-    let mut letters = Vec::<char>::new();
-    let mut words: Vec<String> = Vec::<String>::new();
+#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct Word {
+    word: String,
+    score: u32,
+}
 
-    let best_letter_structs = &all_words[0..4];
+fn get_word_score(word: String, letters: &Vec<Letter>) -> u32 {
+    let mut score: u32 = 0;
 
-    for letter in best_letter_structs {
-        letters.push(letter.letter);
-    }
-
-    for word in words {
-        if contains(word, letters) {
-            words.push(word)
+    for letter in letters {
+        if word.contains(letter.letter) {
+            score += letter.uses;
         }
     }
-    return words;
+
+    return score;
+}
+
+fn get_word_scores(words: Vec<String>, letters: Vec<Letter>) -> Vec<Word> {
+    let mut letters2 = letters.clone();
+    let mut scored_words = Vec::new();
+
+    let mut word_score: u32 = 0;
+
+    for word in words {
+        let mut word2 = word.clone();
+        scored_words.push(Word {
+            word: word,
+            score: get_word_score(word2, &letters2),
+        })
+    }
+
+    return scored_words;
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn contains_test() {
+        assert!(contains("fear".to_string(), 'a'));
+        assert!(!contains("fear".to_string(), 'b'));
+    }
+
+    #[test]
+    fn contains_all_test() {
+        assert!(contains_all("fear".to_string(), "eafr".to_string()));
+        assert!(!contains_all("fear".to_string(), "b".to_string()));
+    }
 }
