@@ -5,7 +5,6 @@ use std::fs;
 fn main() {
     let path = "index.txt";
     let contents = fs::read_to_string(path).expect("something wrong");
-    println!("{}", ','.is_alphabetic());
 
     let words = getwords(contents);
 
