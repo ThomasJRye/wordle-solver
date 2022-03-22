@@ -13,7 +13,20 @@ fn main() {
     let letters = letters_by_usage(&shortwords);
 
     let s = get_word_scores(shortwords, letters);
-    println!("{:?}", s);
+    println!("{:?}", s[0]);
+
+    let mut justletters = vec![
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+        's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+    ];
+
+    iterate(
+        justletters,
+        Vec::<UnPlacedLetter>::new(),
+        Vec::<PlacedLetter>::new(),
+    );
+
+    println!("{:?}", s[0]);
 }
 
 fn getwords(wordList: String) -> Vec<String> {
@@ -39,6 +52,18 @@ fn getwords(wordList: String) -> Vec<String> {
     }
 
     return words;
+}
+
+fn getChars(line: String) -> Vec<char> {
+    let mut letters = Vec::<char>::new();
+
+    for i in line.chars() {
+        if i.is_alphabetic() {
+            letters.push(i);
+        }
+    }
+
+    return letters;
 }
 
 fn fivelettersonly(words: Vec<String>) -> Vec<String> {
@@ -140,20 +165,88 @@ fn get_word_score(word: String, letters: &Vec<Letter>) -> u32 {
 }
 
 fn get_word_scores(words: Vec<String>, letters: Vec<Letter>) -> Vec<Word> {
-    let mut letters2 = letters.clone();
+    let letters2 = letters.clone();
     let mut scored_words = Vec::new();
 
-    let mut word_score: u32 = 0;
-
     for word in words {
-        let mut word2 = word.clone();
+        let word2 = word.clone();
         scored_words.push(Word {
             word: word,
             score: get_word_score(word2, &letters2),
         })
     }
 
+    scored_words.sort_by(|a, b| b.score.cmp(&a.score));
     return scored_words;
+}
+
+#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct PlacedLetter {
+    letter: char,
+    position: u8,
+}
+#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
+struct UnPlacedLetter {
+    letter: char,
+    position: u8,
+}
+
+fn iterate(
+    letters: Vec<char>,
+    unPlacedLetters: Vec<UnPlacedLetter>,
+    PlacedLetters: Vec<PlacedLetter>,
+) {
+    let blocked_letters = getChars(getInput("input blocked letters: ".to_string()));
+
+    let good_letters = block_letters(letters, blocked_letters);
+
+    let UnPlacedLetters = get_unplaced_letters();
+}
+
+fn getInput(message: String) -> String {
+    let mut first_line = String::new();
+    println!("{}", message);
+    std::io::stdin().read_line(&mut first_line).unwrap();
+
+    return first_line;
+}
+
+fn block_letters(letters: Vec<char>, blocked_letters: Vec<char>) -> Vec<char> {
+    let mut good_letters = Vec::new();
+
+    for letter in letters {
+        if blocked_letters.contains(&letter) {
+            good_letters.push(letter);
+        }
+    }
+
+    return good_letters;
+}
+
+fn get_unplaced_letters() -> Vec<UnPlacedLetter> {
+    let mut done = false;
+    let mut input;
+    let mut UnPlacedLetters = Vec::<UnPlacedLetter>::new();
+    let mut letter;
+    let mut position_char;
+
+    while !done {
+        input = getInput("Enter unplaced letter as: A3".to_string());
+
+        if input == "_".to_string() {
+            done = true;
+        }
+
+        letter = input.chars().nth(0).unwrap();
+        position_char = input.chars().nth(1).unwrap();
+
+        UnPlacedLetters.push(UnPlacedLetter {
+            letter: letter,
+            position: position_char.to_string().parse::<u8>().unwrap(),
+        })
+    }
+
+    return UnPlacedLetters;
 }
 #[cfg(test)]
 mod tests {
