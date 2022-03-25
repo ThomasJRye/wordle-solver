@@ -122,6 +122,7 @@ fn letter_counter(words: Vec<String>, letter: char) -> u32 {
     for word in words {
         if word.contains(letter) {
             count += 1;
+        } else {
         }
     }
 
