@@ -1,7 +1,7 @@
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-struct Letter {
-    letter: char,
-    uses: u32,
+pub struct Letter {
+    pub letter: char,
+    pub uses: u32,
 }
 
 pub fn letters_by_usage(words: &Vec<String>) -> Vec<Letter> {

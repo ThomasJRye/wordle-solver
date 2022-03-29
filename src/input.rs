@@ -1,28 +1,30 @@
 use crate::getChars;
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
-struct LetterPos {
+pub struct LetterPos {
     letter: char,
     position: u8,
 }
 
-fn iterate(
+pub fn iterate(
     letters: Vec<char>,
     blocked_letters: Vec<char>,
     UnPlacedLetters: Vec<LetterPos>,
     PlacedLetters: Vec<LetterPos>,
     GoodLetters: Vec<LetterPos>,
 ) {
-    let blocked_letters = getChars(get_input("input blocked letters: ".to_string()));
+    let blocked_letters = getChars(get_input("input blocked letters: "));
 
     let mut placeholder = Vec::<LetterPos>::new();
-    let UnPlacedLetters: Vec<LetterPos> = get_placed_letters(placeholder);
+    let UnPlacedLetters: Vec<LetterPos> =
+        get_placed_letters(placeholder, "Enter placed letters as: A3");
 
     let mut placeholder = Vec::<LetterPos>::new();
-    let mut PlacedLetters: Vec<LetterPos> = get_placed_letters(placeholder);
+    let mut PlacedLetters: Vec<LetterPos> =
+        get_placed_letters(placeholder, "Enter unplaced letters as: A3");
 }
 
-fn get_input(message: String) -> String {
+fn get_input(message: &str) -> String {
     let mut first_line = String::new();
     println!("{}", message);
     std::io::stdin()
@@ -49,7 +51,7 @@ fn get_unplaced_letters(mut UnPlacedLetters: Vec<LetterPos>) -> Vec<LetterPos> {
     let mut letter;
     let mut position_char;
 
-    input = get_input("Enter unplaced letter as: A3".to_string());
+    input = get_input("Enter unplaced letter as: A3");
 
     if input.contains('/') {
         println!("{}", input);
@@ -70,12 +72,12 @@ fn get_unplaced_letters(mut UnPlacedLetters: Vec<LetterPos>) -> Vec<LetterPos> {
     return get_unplaced_letters(UnPlacedLetters);
 }
 
-fn get_placed_letters(mut PlacedLetters: Vec<LetterPos>) -> Vec<LetterPos> {
-    let mut input;
+fn get_placed_letters(mut PlacedLetters: Vec<LetterPos>, message: &str) -> Vec<LetterPos> {
+    let input;
     let mut letter;
     let mut position_char;
 
-    input = get_input("Enter placed letter as: A3".to_string());
+    input = get_input(message);
 
     if input.contains('/') {
         println!("{}", input);
@@ -93,5 +95,5 @@ fn get_placed_letters(mut PlacedLetters: Vec<LetterPos>) -> Vec<LetterPos> {
         }
     }
 
-    return get_placed_letters(PlacedLetters);
+    return get_placed_letters(PlacedLetters, message.clone());
 }

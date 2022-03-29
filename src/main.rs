@@ -6,6 +6,10 @@ use std::env;
 use std::fs;
 use std::io::{self, stdin, Write};
 
+use letter::Letter;
+
+use crate::input::LetterPos;
+
 fn main() {
     let path = "index.txt";
     let contents = fs::read_to_string(path).expect("something wrong");
@@ -19,14 +23,14 @@ fn main() {
     let s = get_word_scores(shortwords, letters);
     println!("{:?}", s[0]);
 
-    let mut justletters = vec![
+    let justletters = vec![
         'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
         's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
     ];
 
     let mut blockedletters = vec![];
 
-    iterate(
+    input::iterate(
         justletters,
         blockedletters,
         Vec::<LetterPos>::new(),
