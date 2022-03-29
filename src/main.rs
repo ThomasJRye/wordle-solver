@@ -1,5 +1,6 @@
-use input;
-use letter;
+mod input;
+mod letter;
+
 use std::borrow::Borrow;
 use std::env;
 use std::fs;
@@ -13,7 +14,7 @@ fn main() {
 
     let shortwords = fivelettersonly(words);
 
-    let letters = letters_by_usage(&shortwords);
+    let letters = letter::letters_by_usage(&shortwords);
 
     let s = get_word_scores(shortwords, letters);
     println!("{:?}", s[0]);
@@ -115,18 +116,6 @@ fn contains_all(word: String, letters: String) -> bool {
     }
 
     return true;
-}
-
-fn letter_counter(words: Vec<String>, letter: char) -> u32 {
-    let mut count: u32 = 0;
-    for word in words {
-        if word.contains(letter) {
-            count += 1;
-        } else {
-        }
-    }
-
-    return count;
 }
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]

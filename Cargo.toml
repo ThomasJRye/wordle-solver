@@ -11,5 +11,5 @@ serde_json = "1.0.48"
 
 [[bin]]
 name = "wordle-solver"
-path = "main.rs"
+path = "./src/main.rs"
 
