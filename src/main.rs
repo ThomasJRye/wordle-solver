@@ -28,11 +28,9 @@ fn main() {
         's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
     ];
 
-    let mut blockedletters = vec![];
-
     input::iterate(
         justletters,
-        blockedletters,
+        vec![],
         Vec::<LetterPos>::new(),
         Vec::<LetterPos>::new(),
         Vec::<LetterPos>::new(),

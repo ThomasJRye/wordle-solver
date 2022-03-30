@@ -1,6 +1,6 @@
 use crate::getChars;
 
-#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
+#[derive(Debug, Eq, Ord, PartialEq, PartialOrd, Clone, Copy)]
 pub struct LetterPos {
     letter: char,
     position: u8,
@@ -15,13 +15,13 @@ pub fn iterate(
 ) {
     let blocked_letters = getChars(get_input("input blocked letters: "));
 
-    let mut placeholder = Vec::<LetterPos>::new();
     let UnPlacedLetters: Vec<LetterPos> =
-        get_placed_letters(placeholder, "Enter placed letters as: A3");
+        get_placed_letters(Vec::<LetterPos>::new(), "Enter placed letters as: A3");
 
-    let mut placeholder = Vec::<LetterPos>::new();
-    let mut PlacedLetters: Vec<LetterPos> =
-        get_placed_letters(placeholder, "Enter unplaced letters as: A3");
+    let PlacedLetters: Vec<LetterPos> =
+        get_placed_letters(Vec::<LetterPos>::new(), "Enter unplaced letters as: A3");
+
+    //let remaining_words =
 }
 
 fn get_input(message: &str) -> String {
@@ -96,4 +96,49 @@ fn get_placed_letters(mut PlacedLetters: Vec<LetterPos>, message: &str) -> Vec<L
     }
 
     return get_placed_letters(PlacedLetters, message.clone());
+}
+
+fn filter_words(
+    wordList: Vec<String>,
+    blocked_letters: Vec<char>,
+    UnPlacedLetters: Vec<LetterPos>,
+    PacedLetters: Vec<LetterPos>,
+) -> Vec<String> {
+    return vec!["".to_string()];
+}
+
+fn contains_placed_letter(word: String, placed_letter: LetterPos) -> bool {
+    for i in word.chars() {
+        if word.find(placed_letter.letter) == word.find(i) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+mod tests {
+    use super::*;
+
+    #[test]
+    fn contains_test() {
+        let placedLetter1 = LetterPos {
+            letter: 'e',
+            position: 1,
+        };
+
+        let placedLetter2 = LetterPos {
+            letter: 'h',
+            position: 0,
+        };
+        let placedLetters = vec![placedLetter1, placedLetter2];
+
+        assert!(contains_placed_letter("hello".to_string(), placedLetter1));
+        assert!(contains_placed_letter("hello".to_string(), placedLetter2));
+        assert!(!contains_placed_letter("balls".to_string(), placedLetter1));
+        //assert!(!contains("fear".to_string(), 'b'));
+    }
+
+    #[test]
+    fn contains_all_test() {}
 }
