@@ -16,10 +16,10 @@ pub fn iterate(
     let blocked_letters = getChars(get_input("input blocked letters: "));
 
     let UnPlacedLetters: Vec<LetterPos> =
-        get_placed_letters(Vec::<LetterPos>::new(), "Enter placed letters as: A3");
+        get_letters(Vec::<LetterPos>::new(), "Enter placed letters as: A3");
 
     let PlacedLetters: Vec<LetterPos> =
-        get_placed_letters(Vec::<LetterPos>::new(), "Enter unplaced letters as: A3");
+        get_letters(Vec::<LetterPos>::new(), "Enter unplaced letters as: A3");
 
     //let remaining_words =
 }
@@ -72,7 +72,7 @@ fn get_unplaced_letters(mut UnPlacedLetters: Vec<LetterPos>) -> Vec<LetterPos> {
     return get_unplaced_letters(UnPlacedLetters);
 }
 
-fn get_placed_letters(mut PlacedLetters: Vec<LetterPos>, message: &str) -> Vec<LetterPos> {
+fn get_letters(mut PlacedLetters: Vec<LetterPos>, message: &str) -> Vec<LetterPos> {
     let input;
     let mut letter;
     let mut position_char;
@@ -95,7 +95,7 @@ fn get_placed_letters(mut PlacedLetters: Vec<LetterPos>, message: &str) -> Vec<L
         }
     }
 
-    return get_placed_letters(PlacedLetters, message.clone());
+    return get_letters(PlacedLetters, message.clone());
 }
 
 fn filter_words(
@@ -104,17 +104,63 @@ fn filter_words(
     UnPlacedLetters: Vec<LetterPos>,
     PacedLetters: Vec<LetterPos>,
 ) -> Vec<String> {
+    let goodWords: Vec<String> = vec![];
+
+    let mut placeholder: String;
+    for word in wordList {
+        for letter in PacedLetters.clone() {
+            placeholder = word.clone();
+            if check_placed_letter(word.clone(), letter) {
+                for letter in UnPlacedLetters.clone() {
+                    if check_unplaced_letter(word.clone(), letter) {
+                        if check_blocked_letters(word, blocked_letters) {
+                            goodWords.push(word);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     return vec!["".to_string()];
 }
 
-fn contains_placed_letter(word: String, placed_letter: LetterPos) -> bool {
+fn check_placed_letter(word: String, letter: LetterPos) -> bool {
     for i in word.chars() {
-        if word.find(placed_letter.letter) == word.find(i) {
+        if word.find(letter.letter) == word.find(i) {
             return true;
         }
     }
 
     return false;
+}
+
+fn check_unplaced_letter(word: String, letter: LetterPos) -> bool {
+    for i in word.chars() {
+        if word.find(letter.letter) == word.find(i) {
+            return false;
+        } else {
+            for i in word.chars() {
+                if i == letter.letter {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+fn check_blocked_letters(word: String, blocked_letters: Vec<char>) -> bool {
+    for i in word.chars() {
+        for letter in blocked_letters.clone() {
+            if i == letter {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 mod tests {
@@ -133,9 +179,9 @@ mod tests {
         };
         let placedLetters = vec![placedLetter1, placedLetter2];
 
-        assert!(contains_placed_letter("hello".to_string(), placedLetter1));
-        assert!(contains_placed_letter("hello".to_string(), placedLetter2));
-        assert!(!contains_placed_letter("balls".to_string(), placedLetter1));
+        assert!(check_placed_letter("hello".to_string(), placedLetter1));
+        assert!(check_placed_letter("hello".to_string(), placedLetter2));
+        assert!(!check_placed_letter("balls".to_string(), placedLetter1));
         //assert!(!contains("fear".to_string(), 'b'));
     }
 
