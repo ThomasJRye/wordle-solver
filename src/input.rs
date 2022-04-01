@@ -11,17 +11,21 @@ pub fn iterate(
     blocked_letters: Vec<char>,
     UnPlacedLetters: Vec<LetterPos>,
     PlacedLetters: Vec<LetterPos>,
-    GoodLetters: Vec<LetterPos>,
+    wordList: Vec<String>,
 ) {
-    let blocked_letters = getChars(get_input("input blocked letters: "));
+    blocked_letters.append(&mut getChars(get_input("input blocked letters: ")));
 
-    let UnPlacedLetters: Vec<LetterPos> =
-        get_letters(Vec::<LetterPos>::new(), "Enter placed letters as: A3");
+    UnPlacedLetters.append(&mut get_letters(
+        Vec::<LetterPos>::new(),
+        "Enter placed letters as: A3",
+    ));
 
-    let PlacedLetters: Vec<LetterPos> =
-        get_letters(Vec::<LetterPos>::new(), "Enter unplaced letters as: A3");
+    PlacedLetters.append(&mut get_letters(
+        Vec::<LetterPos>::new(),
+        "Enter unplaced letters as: A3",
+    ));
 
-    //let remaining_words =
+    let remaining_words = filter_words(wordList, blocked_letters, UnPlacedLetters, PlacedLetters);
 }
 
 fn get_input(message: &str) -> String {
@@ -104,17 +108,17 @@ fn filter_words(
     UnPlacedLetters: Vec<LetterPos>,
     PacedLetters: Vec<LetterPos>,
 ) -> Vec<String> {
-    let goodWords: Vec<String> = vec![];
+    let mut goodWords: Vec<String> = vec![];
 
     let mut placeholder: String;
     for word in wordList {
+        placeholder = word.clone();
         for letter in PacedLetters.clone() {
-            placeholder = word.clone();
-            if check_placed_letter(word.clone(), letter) {
+            if check_placed_letter(placeholder.clone(), letter) {
                 for letter in UnPlacedLetters.clone() {
-                    if check_unplaced_letter(word.clone(), letter) {
-                        if check_blocked_letters(word, blocked_letters) {
-                            goodWords.push(word);
+                    if check_unplaced_letter(placeholder.clone(), letter) {
+                        if check_blocked_letters(placeholder.clone(), blocked_letters.clone()) {
+                            goodWords.push(word.clone());
                         }
                     }
                 }
