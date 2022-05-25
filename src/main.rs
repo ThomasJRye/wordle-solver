@@ -1,14 +1,13 @@
 mod input;
 mod letter;
+mod scoring;
 
-use std::borrow::Borrow;
-use std::env;
+use self::input::LetterPos;
+use crate::input::input::iterate;
+use crate::scoring::scoring::get_word_scores;
+
 use std::fs;
 use std::io::{self, stdin, Write};
-
-use letter::Letter;
-
-use crate::input::LetterPos;
 
 fn main() {
     let path = "index.txt";
@@ -20,18 +19,13 @@ fn main() {
 
     let letters = letter::letters_by_usage(&shortwords);
 
-    let s = get_word_scores(shortwords.clone(), letters);
+    let s = get_word_scores(shortwords.clone(), letters.clone());
     println!("{:?}", s[0]);
 
-    let justletters = vec![
-        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
-        's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-    ];
-
-    input::iterate(
-        justletters,
+    iterate(
+        letters.clone(),
         vec![],
-        Vec::<LetterPos>::new(),
+        Vec::<input::LetterPos>::new(),
         Vec::<LetterPos>::new(),
         Vec::<LetterPos>::new(),
         shortwords,
@@ -63,18 +57,6 @@ fn getwords(word_list: String) -> Vec<String> {
     }
 
     return words;
-}
-
-fn getChars(line: String) -> Vec<char> {
-    let mut letters = Vec::<char>::new();
-
-    for i in line.chars() {
-        if i.is_alphabetic() {
-            letters.push(i);
-        }
-    }
-
-    return letters;
 }
 
 fn fivelettersonly(words: Vec<String>) -> Vec<String> {
@@ -119,40 +101,6 @@ fn contains_all(word: String, letters: String) -> bool {
     }
 
     return true;
-}
-
-#[derive(Debug, Eq, Ord, PartialEq, PartialOrd)]
-struct Word {
-    word: String,
-    score: u32,
-}
-
-fn get_word_score(word: String, letters: &Vec<Letter>) -> u32 {
-    let mut score: u32 = 0;
-
-    for letter in letters {
-        if word.contains(letter.letter) {
-            score += letter.uses;
-        }
-    }
-
-    return score;
-}
-
-fn get_word_scores(words: Vec<String>, letters: Vec<Letter>) -> Vec<Word> {
-    let letters2 = letters.clone();
-    let mut scored_words = Vec::new();
-
-    for word in words {
-        let word2 = word.clone();
-        scored_words.push(Word {
-            word: word,
-            score: get_word_score(word2, &letters2),
-        })
-    }
-
-    scored_words.sort_by(|a, b| b.score.cmp(&a.score));
-    return scored_words;
 }
 
 #[cfg(test)]
