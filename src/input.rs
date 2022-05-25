@@ -9,42 +9,51 @@ pub mod input {
     use crate::letter::Letter;
 
     pub fn iterate(
-        mut letters: Vec<Letter>,
+        letters: Vec<Letter>,
         mut blocked_letters: Vec<char>,
-        mut UnPlacedLetters: Vec<LetterPos>,
-        mut PlacedLetters: Vec<LetterPos>,
+        mut un_placed_letters: Vec<LetterPos>,
+        mut placed_letters: Vec<LetterPos>,
         GoodLetters: Vec<LetterPos>,
         words: Vec<String>,
     ) {
-        blocked_letters.append(&mut getChars(get_input("input blocked letters: ")));
+        blocked_letters.append(&mut get_chars(get_input("input blocked letters: ")));
 
-        PlacedLetters.append(&mut get_letters(
+        println!("");
+        println!("Letters must be written one at a time. With letter first followed by index.");
+        println!("If there is a good letter(green) A in the first spot write A0");
+        println!("Write / when all placed letters are written");
+
+        placed_letters.append(&mut get_letters(
             Vec::<LetterPos>::new(),
-            "Enter placed letters as: A3",
+            "Enter placed letters:",
         ));
 
-        UnPlacedLetters.append(&mut get_letters(
+        println!("");
+        println!("");
+        println!("Now repeat for unplaced letters(yellow)");
+        un_placed_letters.append(&mut get_letters(
             Vec::<LetterPos>::new(),
-            "Enter unplaced letters as: A3",
+            "Enter unplaced letters on at a time: ",
         ));
 
         let remaining_words = filter_words(
             words.clone(),
             blocked_letters.clone(),
-            UnPlacedLetters.clone(),
-            PlacedLetters.clone(),
+            un_placed_letters.clone(),
+            placed_letters.clone(),
         );
-
+        println!("");
+        println!("");
         println!("Remaining words: {:?}", remaining_words.clone());
-
+        println!("");
         let word_scores = get_word_scores(remaining_words.clone(), letters.clone());
 
         println!("Best {:?}", word_scores[0]);
         iterate(
             letters.clone(),
             blocked_letters,
-            UnPlacedLetters,
-            PlacedLetters,
+            un_placed_letters,
+            placed_letters,
             GoodLetters,
             remaining_words,
         );
@@ -60,60 +69,22 @@ pub mod input {
         return first_line;
     }
 
-    fn block_letters(letters: Vec<char>, blocked_letters: Vec<char>) -> Vec<char> {
-        let mut good_letters = Vec::new();
-
-        for letter in letters {
-            if blocked_letters.contains(&letter) {
-                good_letters.push(letter);
-            }
-        }
-
-        return good_letters;
-    }
-
-    fn get_unplaced_letters(mut UnPlacedLetters: Vec<LetterPos>) -> Vec<LetterPos> {
-        let mut input;
-        let mut letter;
-        let mut position_char;
-
-        input = get_input("Enter unplaced letter as: A3");
-
-        if input.contains('/') {
-            println!("{}", input);
-            return UnPlacedLetters;
-        } else {
-            letter = input.chars().nth(0).unwrap();
-            position_char = input.chars().nth(1).unwrap();
-
-            match position_char.to_string().parse::<u8>() {
-                Ok(_s) => UnPlacedLetters.push(LetterPos {
-                    letter: letter,
-                    position: _s,
-                }),
-                Err(_err) => println!("nan"),
-            }
-        }
-
-        return get_unplaced_letters(UnPlacedLetters);
-    }
-
-    fn get_letters(mut PlacedLetters: Vec<LetterPos>, message: &str) -> Vec<LetterPos> {
+    fn get_letters(mut placed_letters: Vec<LetterPos>, message: &str) -> Vec<LetterPos> {
         let input;
-        let mut letter;
-        let mut position_char;
+        let letter;
+        let position_char;
 
         input = get_input(message);
 
         if input.contains('/') {
             println!("{}", input);
-            return PlacedLetters;
+            return placed_letters;
         } else {
             letter = input.chars().nth(0).unwrap();
             position_char = input.chars().nth(1).unwrap();
 
             match position_char.to_string().parse::<u8>() {
-                Ok(_s) => PlacedLetters.push(LetterPos {
+                Ok(_s) => placed_letters.push(LetterPos {
                     letter: letter,
                     position: _s,
                 }),
@@ -121,33 +92,25 @@ pub mod input {
             }
         }
 
-        return get_letters(PlacedLetters, message.clone());
+        return get_letters(placed_letters, message.clone());
     }
 
     fn filter_words(
         wordList: Vec<String>,
         blocked_letters: Vec<char>,
-        UnPlacedLetters: Vec<LetterPos>,
-        PlacedLetters: Vec<LetterPos>,
+        un_placed_letters: Vec<LetterPos>,
+        placed_letters: Vec<LetterPos>,
     ) -> Vec<String> {
         let mut good_words: Vec<String> = vec![];
 
         for word in wordList {
             let contains_placed_letter =
-                iter_function(word.clone(), PlacedLetters.clone(), &check_placed_letter);
+                iter_function(word.clone(), placed_letters.clone(), &check_placed_letter);
             let no_blocked_letters = check_blocked_letters(word.clone(), blocked_letters.clone());
             let contains_unplaced_letter = iter_function(
                 word.clone(),
-                UnPlacedLetters.clone(),
+                un_placed_letters.clone(),
                 &check_unplaced_letter,
-            );
-
-            println!(
-                "{:},
-                {:},
-                {:},
-                {:}",
-                word, contains_placed_letter, no_blocked_letters, contains_unplaced_letter,
             );
 
             if contains_placed_letter && no_blocked_letters && contains_unplaced_letter {
@@ -184,12 +147,6 @@ pub mod input {
             Option::None => return false,
         }
 
-        println!(
-            "word: {:?}, letter: {:?}, result: {:?}",
-            word,
-            letter,
-            pos == letter.position
-        );
         if pos == letter.position {
             return true;
         } else {
@@ -226,7 +183,7 @@ pub mod input {
         return true;
     }
 
-    fn getChars(line: String) -> Vec<char> {
+    fn get_chars(line: String) -> Vec<char> {
         let mut letters = Vec::<char>::new();
 
         for i in line.chars() {
@@ -256,7 +213,7 @@ pub mod input {
                 letter: 'c',
                 position: 1,
             };
-            let placedLetters = vec![placedLetter1, placedLetter2];
+            let placed_letters = vec![placedLetter1, placedLetter2];
 
             assert!(check_placed_letter("hello".to_string(), placedLetter1));
             assert!(check_placed_letter("hello".to_string(), placedLetter2));

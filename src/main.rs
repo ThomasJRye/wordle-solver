@@ -7,7 +7,6 @@ use crate::input::input::iterate;
 use crate::scoring::scoring::get_word_scores;
 
 use std::fs;
-use std::io::{self, stdin, Write};
 
 fn main() {
     let path = "index.txt";
@@ -69,53 +68,4 @@ fn fivelettersonly(words: Vec<String>) -> Vec<String> {
     }
 
     return shortwords;
-}
-
-fn charfilter(words: Vec<String>, letter: char) -> Vec<String> {
-    let mut filteredwords = Vec::<String>::new();
-
-    for word in words {
-        if word.contains(letter) {
-            filteredwords.push(word.to_string());
-        }
-    }
-
-    return filteredwords;
-}
-
-fn contains(word: String, letter: char) -> bool {
-    for i in word.chars() {
-        if i == letter {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-fn contains_all(word: String, letters: String) -> bool {
-    for i in letters.chars() {
-        if !word.contains(i) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn contains_test() {
-        assert!(contains("fear".to_string(), 'a'));
-        assert!(!contains("fear".to_string(), 'b'));
-    }
-
-    #[test]
-    fn contains_all_test() {
-        assert!(contains_all("fear".to_string(), "eafr".to_string()));
-        assert!(!contains_all("fear".to_string(), "b".to_string()));
-    }
 }
