@@ -1,4 +1,4 @@
-use crate::getChars;
+use crate::{getChars, getwords};
 
 #[derive(Debug, Eq, Ord, PartialEq, PartialOrd, Clone, Copy)]
 pub struct LetterPos {
@@ -12,6 +12,7 @@ pub fn iterate(
     UnPlacedLetters: Vec<LetterPos>,
     PlacedLetters: Vec<LetterPos>,
     GoodLetters: Vec<LetterPos>,
+    words: Vec<String>,
 ) {
     let blocked_letters = getChars(get_input("input blocked letters: "));
 
@@ -21,7 +22,23 @@ pub fn iterate(
     let PlacedLetters: Vec<LetterPos> =
         get_letters(Vec::<LetterPos>::new(), "Enter unplaced letters as: A3");
 
-    //let remaining_words =
+    let remaining_words = filter_words(
+        words.clone(),
+        blocked_letters.clone(),
+        UnPlacedLetters.clone(),
+        PlacedLetters.clone(),
+    );
+
+    println!("{}", remaining_words[0]);
+
+    iterate(
+        letters,
+        blocked_letters,
+        UnPlacedLetters,
+        PlacedLetters,
+        GoodLetters,
+        words,
+    );
 }
 
 fn get_input(message: &str) -> String {
@@ -102,29 +119,39 @@ fn filter_words(
     wordList: Vec<String>,
     blocked_letters: Vec<char>,
     UnPlacedLetters: Vec<LetterPos>,
-    PacedLetters: Vec<LetterPos>,
+    PlacedLetters: Vec<LetterPos>,
 ) -> Vec<String> {
-    let goodWords: Vec<String> = vec![];
+    let mut good_words: Vec<String> = vec![];
 
-    let mut placeholder: String;
     for word in wordList {
-        for letter in PacedLetters.clone() {
-            placeholder = word.clone();
-            if check_placed_letter(word.clone(), letter) {
-                for letter in UnPlacedLetters.clone() {
-                    if check_unplaced_letter(word.clone(), letter) {
-                        if check_blocked_letters(word, blocked_letters) {
-                            goodWords.push(word);
-                        }
-                    }
-                }
-            }
+        if iter_function(word.clone(), PlacedLetters.clone(), &check_placed_letter)
+            && check_blocked_letters(word.clone(), blocked_letters.clone())
+            && iter_function(
+                word.clone(),
+                UnPlacedLetters.clone(),
+                &check_unplaced_letter,
+            )
+        {
+            good_words.push(word.clone());
         }
     }
 
-    return vec!["".to_string()];
+    return good_words;
 }
 
+fn iter_function(
+    word: String,
+    letters: Vec<LetterPos>,
+    f: &dyn Fn(String, LetterPos) -> bool,
+) -> bool {
+    for letter in letters {
+        if !f(word.clone(), letter) {
+            return false;
+        }
+    }
+
+    return true;
+}
 fn check_placed_letter(word: String, letter: LetterPos) -> bool {
     for i in word.chars() {
         if word.find(letter.letter) == word.find(i) {

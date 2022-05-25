@@ -20,7 +20,7 @@ fn main() {
 
     let letters = letter::letters_by_usage(&shortwords);
 
-    let s = get_word_scores(shortwords, letters);
+    let s = get_word_scores(shortwords.clone(), letters);
     println!("{:?}", s[0]);
 
     let justletters = vec![
@@ -34,26 +34,27 @@ fn main() {
         Vec::<LetterPos>::new(),
         Vec::<LetterPos>::new(),
         Vec::<LetterPos>::new(),
+        shortwords,
     );
 
     println!("{:?}", s[0]);
 }
 
-fn getwords(wordList: String) -> Vec<String> {
+fn getwords(word_list: String) -> Vec<String> {
     let mut iterator = 0;
     let mut length_read = 0;
 
     let mut words = Vec::<String>::new();
 
-    let length = wordList.len();
+    let length = word_list.len();
 
-    let mut word: String = "".to_string();
+    let _word: String = "".to_string();
 
-    for i in wordList.chars() {
+    for i in word_list.chars() {
         if i.is_alphabetic() {
             iterator += 1;
         } else if length_read + iterator < length {
-            words.push(wordList[length_read..length_read + iterator].to_string());
+            words.push(word_list[length_read..length_read + iterator].to_string());
 
             length_read = length_read + iterator;
             length_read += 1;
