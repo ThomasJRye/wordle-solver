@@ -5,8 +5,10 @@ pub struct LetterPos {
 }
 pub mod input {
     use super::LetterPos;
-    use crate::get_word_scores;
     use crate::letter::Letter;
+    use crate::{get_word_scores, letter};
+
+    use std::ops::Range;
 
     pub fn iterate(
         letters: Vec<Letter>,
@@ -137,8 +139,18 @@ pub mod input {
 
         return true;
     }
-    fn check_placed_letter(word: String, letter: LetterPos) -> bool {
-        let letter_position = word.chars().position(|c| c == letter.letter);
+    fn check_placed_letter(word: String, letterStruct: LetterPos) -> bool {
+        let letter = letterStruct.letter;
+
+        match word.matches(letter).count() {
+            1 => return check_one_placed_letter(word, letterStruct),
+            2 => return check_two_placed_letters(word, letterStruct),
+            _ => return false,
+        }
+    }
+
+    fn check_one_placed_letter(word: String, letterStruct: LetterPos) -> bool {
+        let letter_position = word.chars().position(|c| c == letterStruct.letter);
 
         let pos: u8;
 
@@ -147,11 +159,34 @@ pub mod input {
             Option::None => return false,
         }
 
-        if pos == letter.position {
+        if pos == letterStruct.position {
             return true;
         } else {
             return false;
         }
+    }
+
+    fn check_two_placed_letters(mut word: String, letterStruct: LetterPos) -> bool {
+        let letter_position1_option = word.chars().position(|c| c == letterStruct.letter);
+
+        let letter_position1;
+
+        match letter_position1_option {
+            Option::Some(val) => letter_position1 = val as u8,
+            Option::None => return false,
+        }
+
+        let mut new_word = String::from(word);
+        //let range: Range<Idx> = std::ops::Range {
+        //    start: letter_position1.into(),
+        //    end: letter_position1.into() + 1,
+        //};
+
+        let lower: usize = letter_position1.into();
+        let higher: usize = letter_position1 as usize + 1;
+        new_word.replace_range(lower..higher, "?");
+
+        return check_one_placed_letter(new_word, letterStruct);
     }
 
     fn check_unplaced_letter(word: String, letter: LetterPos) -> bool {
@@ -226,14 +261,7 @@ pub mod input {
                 letter: 'h',
                 position: 1,
             };
-            println!(
-                "check_placed_letter={:?}",
-                check_placed_letter("zymic".to_string(), placedLetter0)
-            );
-            println!(
-                "check_unplaced_letter={:?}",
-                check_unplaced_letter("hello".to_string(), placedLetter0)
-            );
+            println!("How many s in asset?={:?}", "aet".matches('s').count());
         }
     }
 }
