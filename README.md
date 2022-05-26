@@ -4,4 +4,4 @@ Command line tool for solving the wordle game at: https://www.nytimes.com/games/
 
 To run copy repository and use command:
 
-cargo run main
+cargo run
