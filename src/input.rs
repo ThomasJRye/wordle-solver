@@ -8,36 +8,34 @@ pub mod input {
     use crate::letter::Letter;
     use crate::{get_word_scores, letter};
 
-    use std::ops::Range;
-
     pub fn iterate(
         letters: Vec<Letter>,
         mut blocked_letters: Vec<char>,
         mut un_placed_letters: Vec<LetterPos>,
         mut placed_letters: Vec<LetterPos>,
-        GoodLetters: Vec<LetterPos>,
+        good_letters: Vec<LetterPos>,
         words: Vec<String>,
     ) {
         blocked_letters.append(&mut get_chars(get_input("input blocked letters: ")));
-
+    
         println!("");
-        println!("Letters must be written one at a time. With letter first followed by index.");
         println!("If there is a good letter(green) A in the first spot write A0");
         println!("Write / when all placed letters are written");
+        println!("Letters must be written one at a time. With letter first followed by index.");
 
         placed_letters.append(&mut get_letters(
             Vec::<LetterPos>::new(),
             "Enter placed letters:",
         ));
-
+    
         println!("");
         println!("");
         println!("Now repeat for unplaced letters(yellow)");
         un_placed_letters.append(&mut get_letters(
             Vec::<LetterPos>::new(),
-            "Enter unplaced letters on at a time: ",
+            "Enter unplaced letters one at a time: ",
         ));
-
+    
         let remaining_words = filter_words(
             words.clone(),
             blocked_letters.clone(),
@@ -49,14 +47,22 @@ pub mod input {
         println!("Remaining words: {:?}", remaining_words.clone());
         println!("");
         let word_scores = get_word_scores(remaining_words.clone(), letters.clone());
-
+    
         println!("Best {:?}", word_scores[0]);
+    
+        // Base case to exit recursion
+        if remaining_words.is_empty() {
+            println!("No more words remaining. Ending iteration.");
+            return;
+        }
+    
+        // Continue recursion if there are still words left
         iterate(
             letters.clone(),
             blocked_letters,
             un_placed_letters,
             placed_letters,
-            GoodLetters,
+            good_letters,
             remaining_words,
         );
     }
@@ -95,17 +101,18 @@ pub mod input {
         }
 
         return get_letters(placed_letters, message.clone());
+
     }
 
     fn filter_words(
-        wordList: Vec<String>,
+        word_list: Vec<String>,
         blocked_letters: Vec<char>,
         un_placed_letters: Vec<LetterPos>,
         placed_letters: Vec<LetterPos>,
     ) -> Vec<String> {
         let mut good_words: Vec<String> = vec![];
 
-        for word in wordList {
+        for word in word_list {
             let contains_placed_letter =
                 iter_function(word.clone(), placed_letters.clone(), &check_placed_letter);
             let no_blocked_letters = check_blocked_letters(word.clone(), blocked_letters.clone());
@@ -139,18 +146,18 @@ pub mod input {
 
         return true;
     }
-    fn check_placed_letter(word: String, letterStruct: LetterPos) -> bool {
-        let letter = letterStruct.letter;
+    fn check_placed_letter(word: String, letter_struct: LetterPos) -> bool {
+        let letter = letter_struct.letter;
 
         match word.matches(letter).count() {
-            1 => return check_one_placed_letter(word, letterStruct),
-            2 => return check_two_placed_letters(word, letterStruct),
+            1 => return check_one_placed_letter(word, letter_struct),
+            2 => return check_two_placed_letters(word, letter_struct),
             _ => return false,
         }
     }
 
-    fn check_one_placed_letter(word: String, letterStruct: LetterPos) -> bool {
-        let letter_position = word.chars().position(|c| c == letterStruct.letter);
+    fn check_one_placed_letter(word: String, letter_struct: LetterPos) -> bool {
+        let letter_position = word.chars().position(|c| c == letter_struct.letter);
 
         let pos: u8;
 
@@ -159,15 +166,15 @@ pub mod input {
             Option::None => return false,
         }
 
-        if pos == letterStruct.position {
+        if pos == letter_struct.position {
             return true;
         } else {
             return false;
         }
     }
 
-    fn check_two_placed_letters(mut word: String, letterStruct: LetterPos) -> bool {
-        let letter_position1_option = word.chars().position(|c| c == letterStruct.letter);
+    fn check_two_placed_letters(mut word: String, letter_struct: LetterPos) -> bool {
+        let letter_position1_option = word.chars().position(|c| c == letter_struct.letter);
 
         let letter_position1;
 
@@ -186,7 +193,7 @@ pub mod input {
         let higher: usize = letter_position1 as usize + 1;
         new_word.replace_range(lower..higher, "?");
 
-        return check_one_placed_letter(new_word, letterStruct);
+        return check_one_placed_letter(new_word, letter_struct);
     }
 
     fn check_unplaced_letter(word: String, letter: LetterPos) -> bool {
